@@ -169,6 +169,7 @@ void Value_iteration(pState S[21][21], int n, float gamma)
                         {
                             float* prob_reward = transition_prob(S[i][j], S[h][k], move);
                             Sa[a] += (prob_reward[1] + prob_reward[0]*gamma*S[h][k]->v);
+                            free(prob_reward);
                         }
                     }
                 }
