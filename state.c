@@ -112,14 +112,14 @@ int policy(int start1, int start2, int move)
 float* transition_prob(pState start, pState end, int move)//P(r, s' | s, a)
 {
     float* prob_reward = (float*)malloc(2*sizeof(float));
+   
     if(policy(start->nS1, start->nS2, move) * policy(start->nS2, start->nS1, -move) == 0)
     {//infeasible
         prob_reward[0] = 0;
         prob_reward[1] = 0;
         return prob_reward;
     }
-
-    int startS1 = start->nS1 + move;
+     int startS1 = start->nS1 + move;
     int startS2 = start->nS2 - move;
     int endS1 = end->nS1;
     int endS2 = end->nS2;
@@ -157,8 +157,9 @@ void Value_iteration(pState S[21][21], int n, float gamma)
         {
             for(int j = 0; j < n; j++)
             {
+                //estimate value
                 float Sa[11];
-                for(int a = 0; a <= 11; a++)
+                for(int a = 0; a < 11; a++)
                 {
                     int move = action[a];
                     Sa[a] = -2*abs(move)*policy(i, j, move)*policy(j, i, -move);
@@ -174,7 +175,7 @@ void Value_iteration(pState S[21][21], int n, float gamma)
                 //improve policy
                 float V = S[i][j]->v;
                 float max = Sa[0];
-                for(int a = 0; a<= 11; a++)
+                for(int a = 0; a< 11; a++)
                 {
                     if(Sa[a] >= max)
                     {
@@ -183,8 +184,6 @@ void Value_iteration(pState S[21][21], int n, float gamma)
                         max = Sa[a];
                     }
                 }
-                // if(i == 20)
-                //     Sa[0] = 1;
                 //terminate
                 float error = abs(V - S[i][j]->v);
                 if(delta < error) delta = error;   
