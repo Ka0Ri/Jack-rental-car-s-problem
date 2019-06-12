@@ -4,7 +4,7 @@ import seaborn as sns
 import os
 from mpl_toolkits.mplot3d import Axes3D
 
-path = os.getcwd() + "/result/result10.txt"
+path = os.getcwd() + "/result/resultoptimal.txt"
 
 f = open(path, "r")
 value = np.zeros((21, 21))
@@ -21,7 +21,7 @@ for line in f:
     i = i + 1
 
 ax = sns.heatmap(action, linewidth=0.5)
-ax.set_title("Iteration = 10")
+ax.set_title("Optimal")
 ax.set_xlabel("cars at first location")
 ax.set_ylabel("cars at second location")
 plt.show()
@@ -33,6 +33,6 @@ ha.plot_surface(X, Y, value)
 ha.set_xlabel("cars at first location")
 ha.set_ylabel("cars at second location")
 ha.set_zlabel("value")
-ha.set_title("Iteration = 10")
+ha.set_title("Optimnal")
 plt.show()
 f.close()

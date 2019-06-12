@@ -18,7 +18,7 @@ void random_state(int n, pState S[21][21])
 
 void print(pState S[21][21], int n)
 {
-    FILE *fp = fopen("result10.txt", "w+");
+    FILE *fp = fopen("resultoptimal.txt", "w+");
     fprintf(fp, "\t");
     printf("\t");
     for(int i = 0; i < n; i++)
@@ -64,6 +64,8 @@ float* prob_Slot(int start, int end, int rent_lam, int return_lam)
     for(int rented = 0; rented <= start; rented++)
     {
         int returned = end - start + rented;
+        // return_prob = Poisson(returned, return_lam);
+        // rental_prob = Poisson(rented, rent_lam);
         
         if(returned >= 0)//feasible : prob != 0
         {
@@ -82,13 +84,13 @@ float* prob_Slot(int start, int end, int rent_lam, int return_lam)
             //returning probability
             if(end != 20)
             {
-                return_prob = Poisson(returned, rent_lam);
+                return_prob = Poisson(returned, return_lam);
             }
             else//ensure sum of probability = 1
             {
                 return_prob = 1;
-                for(int temp = 1; temp < returned; temp++)
-                    return_prob -= Poisson(temp, rent_lam);
+                for(int temp = 0; temp < returned; temp++)
+                    return_prob -= Poisson(temp, return_lam);
             }
             probs[rented] = return_prob*rental_prob;
         }
@@ -119,14 +121,11 @@ float* transition_prob(pState start, pState end, int move)//P(r, s' | s, a)
         prob_reward[1] = 0;
         return prob_reward;
     }
-     int startS1 = start->nS1 + move;
+    int startS1 = start->nS1 + move;
     int startS2 = start->nS2 - move;
     int endS1 = end->nS1;
     int endS2 = end->nS2;
-    
-    // if(startS1 > 20) startS1 = 20;//move with same payment but restricted
-    // if(startS2 > 20) startS2 = 20;
-    
+       
     float* probs1 = prob_Slot(startS1, endS1, 3, 3);
     float* probs2 = prob_Slot(startS2, endS2, 4, 2);
     float prob = 0;
@@ -168,7 +167,7 @@ void Value_iteration(pState S[21][21], int n, float gamma)
                         for(int k = 0; k < n; k++)
                         {
                             float* prob_reward = transition_prob(S[i][j], S[h][k], move);
-                            Sa[a] += (prob_reward[1] + prob_reward[0]*gamma*S[h][k]->v);
+                            Sa[a] += prob_reward[1] + gamma*S[h][k]->v*prob_reward[0];
                             free(prob_reward);
                         }
                     }
@@ -191,7 +190,7 @@ void Value_iteration(pState S[21][21], int n, float gamma)
             }
         }
         iters++;
-        if(delta < 1 || iters == 10)
+        if(delta <= 10 || iters == 10)
             return;
     }
 }
